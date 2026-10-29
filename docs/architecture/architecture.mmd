@@ -1,0 +1,56 @@
+---
+title: System Architecture - Preference Optimization
+config:
+  theme: base
+  themeVariables:
+    fontFamily: "Inter, system-ui, sans-serif"
+    primaryColor: "#F8FAFC"
+    primaryBorderColor: "#1E293B"
+    primaryTextColor: "#1E293B"
+    lineColor: "#64748B"
+    clusterBkg: "#EEF2FF"
+    clusterBorder: "#94A3B8"
+---
+flowchart TB
+    classDef edge     fill:#F59E0B,stroke:#1E293B,color:#1E293B,stroke-width:1px;
+    classDef core     fill:#6366F1,stroke:#1E293B,color:#ffffff,stroke-width:1px;
+    classDef data     fill:#10B981,stroke:#1E293B,color:#ffffff,stroke-width:1px;
+    classDef control  fill:#0EA5E9,stroke:#1E293B,color:#ffffff,stroke-width:1px;
+    classDef obs      fill:#CBD5E1,stroke:#1E293B,color:#1E293B,stroke-width:1px;
+
+    Client([Client]):::edge
+
+    subgraph Task["Alignment task (hidden gold reward)"]
+        direction TB
+        Reward[(Gold reward weight)]:::data
+        Demos[(Demonstrations<br/>low-temperature teacher)]:::data
+        Prefs[(Preferences<br/>Bradley-Terry annotator)]:::data
+    end
+
+    subgraph Train["Training (once at startup)"]
+        direction TB
+        SFT["Behavior cloning<br/>penalized maximum likelihood"]:::core
+        DPO["Direct Preference Optimization<br/>exact gradient on preference pairs"]:::core
+    end
+
+    Reference[(Reference policy<br/>frozen)]:::data
+    Policy[(Aligned policy)]:::data
+
+    subgraph Edge["Service layer (stdlib HTTP, stateless)"]
+        direction TB
+        Router["Router<br/>/health | /ready | /metrics | /report | /score"]:::core
+        Validate["Validation<br/>prompt in range"]:::control
+    end
+
+    Eval["Evaluation<br/>reward, win-rate, KL, implicit reward correlation"]:::obs
+
+    Reward --> Demos
+    Reward --> Prefs
+    Demos --> SFT --> Reference
+    Reference --> DPO
+    Prefs --> DPO --> Policy
+    Reference -.-> Eval
+    Policy --> Eval
+    Client -->|JSON request| Router --> Validate
+    Validate -->|prompt| Policy
+    Policy -->|distributions and implicit reward| Router -->|JSON response| Client
