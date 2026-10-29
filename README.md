@@ -23,7 +23,7 @@ reinforcement-learning stage of RLHF with a single classification loss on prefer
 reward model to train separately, no rollouts, no clipped policy gradient. It rests on the
 insight that the optimal KL-regularized policy has a closed form, so the reward can be folded
 into the policy itself and fit directly from comparisons. This project implements the whole
-pipeline **from first principles** on a tractable alignment task: a supervised reference fit by
+pipeline **from scratch** on a tractable alignment task: a supervised reference fit by
 **behavior cloning**, a **Bradley-Terry** preference dataset, and the **exact DPO gradient**,
 all with **zero runtime dependencies** and no automatic differentiation.
 
