@@ -75,6 +75,8 @@ def win_rate(
 ) -> float:
     """Fraction of sampled prompts where the policy sample beats the reference sample."""
 
+    if trials <= 0:
+        return 0.0
     rng = random.Random(seed)
     wins = 0.0
     for _ in range(trials):
@@ -124,6 +126,8 @@ def mean_kl(domain: Domain, policy: SoftmaxPolicy, reference: SoftmaxPolicy) -> 
 
 def _pearson(xs: list[float], ys: list[float]) -> float:
     n = len(xs)
+    if n == 0:
+        return 0.0
     mean_x = sum(xs) / n
     mean_y = sum(ys) / n
     covariance = sum((x - mean_x) * (y - mean_y) for x, y in zip(xs, ys, strict=True))

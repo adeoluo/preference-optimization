@@ -6,7 +6,13 @@ import math
 
 from preference_optimization.domain import Domain, demonstrations, preferences
 from preference_optimization.dpo import DPOConfig, preference_loss, train_dpo
-from preference_optimization.evaluation import evaluate, expected_reward, optimal_reward
+from preference_optimization.evaluation import (
+    _pearson,
+    evaluate,
+    expected_reward,
+    optimal_reward,
+    win_rate,
+)
 from preference_optimization.policy import SoftmaxPolicy
 from preference_optimization.sft import SFTConfig, behavior_clone
 
@@ -70,3 +76,17 @@ def test_evaluate_report_is_consistent() -> None:
     assert 0.0 <= report.preference_accuracy <= 1.0
     assert report.mean_kl_to_reference >= 0.0
     assert report.reference_reward <= report.optimal_reward
+
+
+def test_win_rate_zero_trials_is_zero() -> None:
+    # Regression: trials=0 divided by zero.
+    domain = Domain.build(seed=0)
+    policy = SoftmaxPolicy(domain=domain, weight=[0.1] * domain.dim)
+    reference = SoftmaxPolicy(domain=domain, weight=[0.0] * domain.dim)
+    assert win_rate(domain, policy, reference, trials=0, seed=0) == 0.0
+
+
+def test_pearson_degenerate_inputs_are_zero() -> None:
+    # Regression: empty or single-point inputs divided by zero.
+    assert _pearson([], []) == 0.0
+    assert _pearson([1.0], [2.0]) == 0.0
