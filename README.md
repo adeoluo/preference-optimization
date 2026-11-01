@@ -80,6 +80,25 @@ never saw is recovered implicitly: the quantity `beta * log (p / q)` correlates 
 reward at **r = 0.767**. A sweep over `beta` traces the reward versus divergence frontier
 (smaller `beta` aligns harder, see the [evaluation report](docs/EVALUATION_REPORT.md)).
 
+### Scale
+
+`benchmarks/scale.py` aligns a fixed supervised reference with DPO on progressively larger
+synthetic preference datasets (a reduced 15-epoch schedule for the sweep) and reports wall-clock
+time, throughput, peak traced memory (`tracemalloc`), and held-out preference accuracy. Peak
+memory grows linearly with the resident dataset while per-pair throughput stays roughly flat.
+
+| preference pairs | seconds | pairs/sec | peak MiB | held-out accuracy |
+|---:|---:|---:|---:|---:|
+| 2,000 | 2.81 | 710 | 0.22 | 0.831 |
+| 8,000 | 13.46 | 590 | 0.86 | 0.805 |
+| 16,000 | 24.12 | 660 | 1.72 | 0.811 |
+
+Accuracy here sits below the headline 0.863 because the sweep uses 15 epochs rather than the
+full 200, trading a little alignment quality for a bounded runtime. Honest caveat: the data is
+synthetic, this is a pure-Python from-scratch implementation, and it is **not** benchmarked
+against compiled numerical libraries; wall-clock and throughput were measured on a shared
+development machine and will vary. Reproduce with `uv run python benchmarks/scale.py`.
+
 ## Demonstration
 
 ```text
