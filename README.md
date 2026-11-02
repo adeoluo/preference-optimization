@@ -31,6 +31,8 @@ all with no automatic differentiation.
   <img src="docs/architecture/architecture.svg" alt="Architecture diagram" width="860">
 </p>
 
+<sub>Legend: amber = entry points and external systems, indigo = core logic, green = data and state, blue = validation and control, grey = observability and outputs.</sub>
+
 A hidden gold reward defines the truth. A low-temperature teacher produces demonstrations that
 a reference policy is cloned from, and a Bradley-Terry annotator produces noisy preferences
 that DPO optimizes. The learner never sees the reward. See the [ADRs](docs/adr/) for the key
