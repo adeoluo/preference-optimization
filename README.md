@@ -35,7 +35,10 @@ all with no automatic differentiation.
 
 A hidden gold reward defines the truth. A low-temperature teacher produces demonstrations that
 a reference policy is cloned from, and a Bradley-Terry annotator produces noisy preferences
-that DPO optimizes. The learner never sees the reward. See the [ADRs](docs/adr/) for the key
+that DPO optimizes. The learner never sees the reward. The pipeline runs once at startup
+(600 demonstrations, 4000 training pairs, 800 held-out pairs); the evaluation compares the
+aligned policy with the frozen reference against the gold reward, and the HTTP service serves
+the report and validated per-prompt scores. See the [ADRs](docs/adr/) for the key
 decisions.
 
 ### The method

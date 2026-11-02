@@ -5,60 +5,44 @@ flowchart LR
     classDef control  fill:#0EA5E9,stroke:#1E293B,color:#ffffff,stroke-width:1px;
     classDef obs      fill:#CBD5E1,stroke:#1E293B,color:#1E293B,stroke-width:1px;
 
-    Client(["HTTP client<br/>JSON request"]):::edge
-    Cli(["CLI<br/>evaluate, compare, serve"]):::edge
-
-    subgraph Io["Interfaces (stdlib HTTP, stateless)"]
+    subgraph Interfaces["Interfaces"]
         direction TB
-        Router["Request router<br/>/health, /ready, /report, /score"]:::core
-        Validate["Request validation<br/>prompt index in range"]:::control
+        Cli(["CLI<br/>evaluate, compare, serve"]):::edge
+        Client(["HTTP client<br/>JSON prompt"]):::edge
+        Router["HTTP router<br/>/report, /score"]:::core
+        Validate["Validation<br/>prompt index in range"]:::control
+        Cli ~~~ Client --> Router --> Validate
     end
 
-    subgraph Pipe["Core logic (pipeline, once at startup)"]
+    subgraph Core["Alignment pipeline"]
         direction TB
-        Pipeline["run_pipeline<br/>data sizes, beta 0.3, seeds"]:::core
-        Teacher["Teacher<br/>low-temperature demonstrations"]:::core
-        Annotator["Bradley-Terry annotator<br/>noisy preference pairs"]:::core
-        Sft["Behavior cloning<br/>penalized maximum likelihood"]:::core
-        Dpo["DPO<br/>exact hand-derived gradient"]:::core
+        Pipeline["run_pipeline<br/>beta 0.3, seeds"]:::core
+        Teacher["Teacher<br/>demonstrations"]:::core
+        Sft["Behavior cloning<br/>penalized MLE"]:::core
+        Annotator["Bradley-Terry<br/>preference annotator"]:::core
+        Dpo["DPO<br/>exact gradient"]:::core
+        Pipeline --> Teacher --> Sft ~~~ Annotator --> Dpo
     end
 
-    subgraph State["Data and state (in memory)"]
+    subgraph State["Data and state"]
         direction TB
-        Domain[("Domain<br/>prompts, candidates, features,<br/>hidden gold reward")]:::data
-        Demos[("Demonstrations<br/>600 samples")]:::data
-        Prefs[("Preferences<br/>4000 train, 800 held out")]:::data
-        Reference[("Reference policy<br/>frozen log-linear softmax")]:::data
-        Policy[("Aligned policy")]:::data
+        Domain[("Domain<br/>hidden gold reward")]:::data
+        Samples[("Demos and pairs<br/>600 demos, 4800 pairs")]:::data
+        Reference[("Reference policy<br/>frozen")]:::data
+        Policy[("Aligned policy<br/>log-linear softmax")]:::data
+        Domain ~~~ Samples ~~~ Reference ~~~ Policy
     end
 
     subgraph Obs["Evaluation and outputs"]
         direction TB
-        Report["Alignment report<br/>reward gap closed, win rate,<br/>preference accuracy, KL,<br/>implicit reward correlation"]:::obs
-        Score["Per-prompt scores<br/>distributions, implicit reward"]:::obs
-        Metrics["/metrics<br/>Prometheus counts, latency"]:::obs
+        Report["Alignment report<br/>reward gap, win rate"]:::obs
+        Diagnostics["Diagnostics<br/>KL, implicit reward"]:::obs
+        Score["Per-prompt scores<br/>distributions"]:::obs
+        Metrics["/metrics<br/>Prometheus text"]:::obs
+        Report ~~~ Diagnostics ~~~ Score ~~~ Metrics
     end
 
-    Client -->|POST JSON| Router
-    Cli -->|serve| Router
-    Cli -->|beta, seed| Pipeline
-    Router -.->|trains at startup| Pipeline
-    Pipeline --> Teacher
-    Pipeline --> Annotator
-    Pipeline --> Sft
-    Pipeline --> Dpo
-    Teacher -->|samples| Demos
-    Annotator -->|pairs| Prefs
-    Teacher -.->|gold reward| Domain
-    Annotator -.->|gold reward| Domain
-    Sft -.->|reads| Demos
-    Sft -->|fits| Reference
-    Dpo -.->|train pairs| Prefs
-    Dpo -.->|frozen anchor| Reference
-    Dpo -->|aligns| Policy
-    Pipeline -->|held-out evaluation| Report
-    Router -.->|checks| Validate
-    Router -->|prompt| Score
-    Score -.->|log-probabilities| Policy
-    Router -.->|/report| Report
-    Router -.->|timings| Metrics
+    Interfaces -->|prompt| Core
+    Core -->|writes| State
+    State -.->|policies| Obs
+    Core -->|evaluation| Obs
