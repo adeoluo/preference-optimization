@@ -37,6 +37,6 @@ levers are the amount of preference data and beta.
   inspect; the implicit reward recovers much of that visibility.
 
 ## Limits
-Training is pure Python and single-threaded, ideal for study and modest data but not for
+Training is single-threaded Python, ideal for study and modest data but not for
 web-scale preference corpora. The controlled task bounds the conclusions; scaling to real
 alignment is a data and modeling problem, not a throughput one.

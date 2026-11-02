@@ -1,16 +1,14 @@
 <h1 align="center">Preference Optimization</h1>
 
 <p align="center">
-  <em>Direct Preference Optimization built from scratch: a supervised reference policy, a Bradley-Terry preference dataset, and an exact, hand-derived DPO gradient that aligns the policy to the hidden reward, with zero runtime dependencies.</em>
+  <em>Direct Preference Optimization built from scratch: a supervised reference policy, a Bradley-Terry preference dataset, and an exact, hand-derived DPO gradient that aligns the policy to the hidden reward.</em>
 </p>
 
 <p align="center">
-  <a href="https://github.com/adeoluo/preference-optimization/actions/workflows/ci.yml"><img alt="Continuous integration" src="https://github.com/adeoluo/preference-optimization/actions/workflows/ci.yml/badge.svg"></a>
-  <img alt="Coverage" src="https://img.shields.io/badge/coverage-87%25-brightgreen">
+  <a href="https://github.com/adeoluo/preference-optimization/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/adeoluo/preference-optimization/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/adeoluo/preference-optimization/releases"><img alt="Release" src="https://img.shields.io/github/v/release/adeoluo/preference-optimization"></a>
   <img alt="Python" src="https://img.shields.io/badge/python-3.11%20%7C%203.12-blue">
-  <img alt="Type checked" src="https://img.shields.io/badge/mypy-strict-blue">
-  <img alt="Runtime dependencies" src="https://img.shields.io/badge/runtime%20deps-0-brightgreen">
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-green">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green"></a>
 </p>
 
 ---
@@ -25,12 +23,12 @@ insight that the optimal KL-regularized policy has a closed form, so the reward 
 into the policy itself and fit directly from comparisons. This project implements the whole
 pipeline **from scratch** on a tractable alignment task: a supervised reference fit by
 **behavior cloning**, a **Bradley-Terry** preference dataset, and the **exact DPO gradient**,
-all with **zero runtime dependencies** and no automatic differentiation.
+all with no automatic differentiation.
 
 ## Architecture
 
 <p align="center">
-  <img src="docs/architecture/architecture.svg" alt="System architecture" width="900">
+  <img src="docs/architecture/architecture.svg" alt="Architecture diagram" width="860">
 </p>
 
 A hidden gold reward defines the truth. A low-temperature teacher produces demonstrations that
@@ -38,7 +36,7 @@ a reference policy is cloned from, and a Bradley-Terry annotator produces noisy 
 that DPO optimizes. The learner never sees the reward. See the [ADRs](docs/adr/) for the key
 decisions.
 
-## The method
+### The method
 
 DPO aligns a policy `p` toward a frozen reference `q` using preference pairs. For a chosen
 response `w` and a rejected response `l` under prompt `x`, with regularization strength `beta`,
@@ -59,6 +57,17 @@ dL/dtheta = -sigmoid(-m) * beta * (phi(x, w) - phi(x, l)),
 which this project implements directly. The pipeline has three stages: behavior cloning fits
 the reference by penalized maximum likelihood, the preference data is sampled from a
 Bradley-Terry annotator, and DPO aligns a copy of the reference.
+
+### Components
+
+- **domain**: the alignment task, the hidden gold reward, the low-temperature teacher, and the
+  Bradley-Terry preference annotator.
+- **policy**: a log-linear softmax policy with exact distributions, log-probabilities,
+  expected features, and sampling.
+- **sft**: behavior cloning of the reference by penalized maximum likelihood.
+- **dpo**: the DPO loss and the exact, hand-derived gradient, with a training loop.
+- **evaluation**: reward, win-rate, preference accuracy, KL, and implicit reward correlation.
+- **pipeline**: the end-to-end run from task to aligned policy.
 
 ## Results
 
@@ -94,23 +103,10 @@ memory grows linearly with the resident dataset while per-pair throughput stays 
 | 16,000 | 24.12 | 660 | 1.72 | 0.811 |
 
 Accuracy here sits below the headline 0.863 because the sweep uses 15 epochs rather than the
-full 200, trading a little alignment quality for a bounded runtime. Honest caveat: the data is
-synthetic, this is a pure-Python from-scratch implementation, and it is **not** benchmarked
+full 200, trading a little alignment quality for a bounded runtime. Caveat: the data is
+synthetic, this is a from-scratch Python implementation, and it is **not** benchmarked
 against compiled numerical libraries; wall-clock and throughput were measured on a shared
 development machine and will vary. Reproduce with `uv run python benchmarks/scale.py`.
-
-## Demonstration
-
-```text
-$ python -m preference_optimization compare
-Per-prompt greedy choice (reference -> aligned, with the gold-best response):
-  prompt 0: reference r3 -> aligned r1  (gold-best r1, match)
-  prompt 1: reference r0 -> aligned r4  (gold-best r4, match)
-  ...
-```
-
-DPO moves the greedy choice onto the reward-optimal response for prompts where the reference
-was wrong, using only noisy pairwise comparisons.
 
 ## Quickstart
 
@@ -123,7 +119,22 @@ python -m preference_optimization evaluate        # full pipeline and alignment 
 python -m preference_optimization compare         # greedy choice before and after DPO
 ```
 
-Use the pieces directly:
+## Usage
+
+### Demonstration
+
+```text
+$ python -m preference_optimization compare
+Per-prompt greedy choice (reference -> aligned, with the gold-best response):
+  prompt 0: reference r3 -> aligned r1  (gold-best r1, match)
+  prompt 1: reference r0 -> aligned r4  (gold-best r4, match)
+  ...
+```
+
+DPO moves the greedy choice onto the reward-optimal response for prompts where the reference
+was wrong, using only noisy pairwise comparisons.
+
+### Library
 
 ```python
 from preference_optimization import run_pipeline, PipelineConfig
@@ -132,9 +143,9 @@ result = run_pipeline(PipelineConfig(beta=0.3))
 print(result.report.format())
 ```
 
-## Running the service
+### HTTP service
 
-A dependency-free HTTP service runs the pipeline once at startup and serves alignment queries:
+A standard-library HTTP service runs the pipeline once at startup and serves alignment queries:
 
 ```bash
 python -m preference_optimization serve --port 8000
@@ -151,25 +162,35 @@ latency metrics in Prometheus text format). A production-style stress benchmark
 path and tradeoffs are in [docs/SCALING.md](docs/SCALING.md) and a full walk-through is in the
 [case study](docs/CASE_STUDY.md).
 
-## Components
-
-- **domain** - the alignment task, the hidden gold reward, the low-temperature teacher, and the
-  Bradley-Terry preference annotator.
-- **policy** - a log-linear softmax policy with exact distributions, log-probabilities,
-  expected features, and sampling.
-- **sft** - behavior cloning of the reference by penalized maximum likelihood.
-- **dpo** - the DPO loss and the exact, hand-derived gradient, with a training loop.
-- **evaluation** - reward, win-rate, preference accuracy, KL, and implicit reward correlation.
-- **pipeline** - the end-to-end run from task to aligned policy.
-
 ## Design decisions
 
 - **Direct Preference Optimization, not a reward model plus PPO.** A single closed-form loss on
   comparisons, with no separate reward model and no rollouts.
   ([ADR-0002](docs/adr/0002-direct-preference-optimization.md))
 - **A log-linear policy with an exact gradient.** The expected-feature terms cancel in the DPO
-  gradient, giving a clean, dependency-free implementation that is easy to verify.
+  gradient, giving a clean, exact implementation that is easy to verify.
   ([ADR-0003](docs/adr/0003-log-linear-policy.md))
+- **Recording decisions.** ([ADR-0001](docs/adr/0001-record-architecture-decisions.md))
+
+## Testing
+
+```bash
+make test                     # uv run pytest
+make coverage                 # pytest with an 80% coverage gate
+```
+
+The suite has 13 deterministic, offline tests in two modules under `tests/`:
+
+- **Core** (`test_core.py`): policy distributions are normalized, a uniform policy is uniform,
+  log-probabilities match the distribution, behavior cloning improves over uniform, DPO closes
+  the reward gap and lowers the loss, the evaluation report is consistent, and degenerate
+  inputs (zero win-rate trials, constant Pearson inputs) return zero.
+- **HTTP service** (`test_service.py`): the handler is exercised without a socket for health
+  and readiness, `/report`, `/score` (including a bad prompt), unknown routes, and metrics.
+
+CI (`.github/workflows/ci.yml`) runs `ruff format --check`, `ruff check`, `mypy src`, and
+`pytest` with an 80% coverage gate on Python 3.11 and 3.12, then builds the package and the
+Docker image.
 
 ## Responsible AI
 
@@ -195,5 +216,4 @@ path and tradeoffs are in [docs/SCALING.md](docs/SCALING.md) and a full walk-thr
 
 ## License
 
-[MIT](LICENSE). Part of an artificial intelligence engineering portfolio by
-[adeoluo](https://github.com/adeoluo).
+Released under the [MIT License](LICENSE).

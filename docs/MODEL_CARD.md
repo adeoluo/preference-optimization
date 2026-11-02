@@ -2,8 +2,7 @@
 
 ## Overview
 - **What it is:** a from-scratch Direct Preference Optimization pipeline (behavior-cloned
-  reference, Bradley-Terry preferences, exact DPO gradient) over a log-linear policy, with zero
-  runtime dependencies.
+  reference, Bradley-Terry preferences, exact DPO gradient) over a log-linear policy.
 - **Base model(s):** from-scratch; no pretrained components.
 - **Version and date:** 1.0, 2026-01-01.
 

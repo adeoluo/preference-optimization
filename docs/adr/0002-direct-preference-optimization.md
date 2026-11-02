@@ -9,7 +9,7 @@ human preference comparisons, and optimizing the policy against that reward mode
 clipped policy gradient such as PPO while a KL penalty keeps the policy near the reference.
 That pipeline is powerful but heavy: it needs a separate reward model, on-policy rollouts, a
 value function, and careful tuning of the reinforcement-learning stage. We want a transparent,
-dependency-free implementation that still captures the essential alignment problem.
+self-contained implementation that still captures the essential alignment problem.
 
 Direct Preference Optimization observes that the optimal KL-regularized policy has a closed
 form, which can be rearranged so the reward is expressed through the policy and the reference.

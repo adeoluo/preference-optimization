@@ -1,7 +1,7 @@
 [project]
 name = "preference-optimization"
 version = "0.1.0"
-description = "Direct Preference Optimization from scratch: a softmax policy aligned to preferences with an exact DPO gradient, dependency-free."
+description = "Direct Preference Optimization from scratch: a softmax policy aligned to preferences with an exact, hand-derived DPO gradient."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }

@@ -1,8 +1,8 @@
 # Operations Guide - Preference Optimization
 
 The service is a single stateless process that runs the alignment pipeline once at startup and
-then answers read-only queries about the trained policies. It has zero runtime dependencies and
-binds only the Python standard library HTTP server.
+then answers read-only queries about the trained policies. It runs on the Python standard
+library HTTP server.
 
 ## Service contract
 

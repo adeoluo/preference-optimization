@@ -1,4 +1,4 @@
-"""A dependency-free HTTP service exposing the aligned policy.
+"""A standard-library HTTP service exposing the aligned policy.
 
 The service runs the full alignment pipeline once at startup (fit a reference by
 behavior cloning, then align it with Direct Preference Optimization) and then

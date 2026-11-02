@@ -6,7 +6,7 @@
 ## Context
 DPO is usually applied to a neural language-model policy whose per-token log-probabilities are
 produced by automatic differentiation. We want the same objective but with a model simple
-enough to keep the project dependency-free, exact, and fully testable, while still exercising
+enough to keep the gradient exact and fully testable, while still exercising
 every part of the method.
 
 ## Decision
@@ -18,7 +18,7 @@ expected-feature terms in the gradients of the chosen and rejected log-probabili
 the DPO loss gradient reduces to `-sigmoid(-margin) * beta * (phi_chosen - phi_rejected)`.
 
 ## Consequences
-- Training is a few dozen lines of pure Python with no tensor library and no autodiff, and the
+- Training is a few dozen lines with no tensor library and no autodiff, and the
   gradient can be checked by hand.
 - The task is a contextual bandit rather than a sequence model, so results transfer in spirit
   rather than scale; this is recorded as a limitation and a roadmap item.

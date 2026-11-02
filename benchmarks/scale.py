@@ -93,7 +93,7 @@ def measure(
 
 
 def main() -> None:
-    print("Synthetic preference data; a pure-Python, from-scratch DPO implementation.")
+    print("Synthetic preference data; a from-scratch Python DPO implementation.")
     print("Wall-clock is not competitive with compiled numerical libraries.")
     print(f"Running DPO for {_EPOCHS} epochs over each preference dataset.\n")
 
