@@ -177,6 +177,18 @@ DPO training and the preference accuracy it reaches.
   <img src="docs/demo/evaluate.gif" alt="DPO training and the preference accuracy it reaches" width="860">
 </p>
 
+The HTTP service scoring the responses to one prompt under the aligned policy.
+
+<p align="center">
+  <img src="docs/demo/http.gif" alt="The HTTP service scoring the responses to one prompt under the aligned policy" width="860">
+</p>
+
+The DPO report from the service: reward, win rate, and KL to the reference.
+
+<p align="center">
+  <img src="docs/demo/http-report.gif" alt="The DPO report from the service: reward, win rate, and KL to the reference" width="860">
+</p>
+
 ## Design decisions
 
 - **Direct Preference Optimization, not a reward model plus PPO.** A single closed-form loss on
