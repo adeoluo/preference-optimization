@@ -167,6 +167,16 @@ latency metrics in Prometheus text format). A production-style stress benchmark
 path and tradeoffs are in [docs/SCALING.md](docs/SCALING.md) and a full walk-through is in the
 [case study](docs/CASE_STUDY.md).
 
+### Demos
+
+Recorded from real runs with [vhs](https://github.com/charmbracelet/vhs); each tape is in `docs/demo/`.
+
+DPO training and the preference accuracy it reaches.
+
+<p align="center">
+  <img src="docs/demo/evaluate.gif" alt="DPO training and the preference accuracy it reaches" width="860">
+</p>
+
 ## Design decisions
 
 - **Direct Preference Optimization, not a reward model plus PPO.** A single closed-form loss on
