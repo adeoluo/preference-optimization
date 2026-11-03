@@ -1,0 +1,35 @@
+# Changelog
+
+All notable changes to this project are documented here. The file is generated
+from Conventional Commits by [git-cliff](https://git-cliff.org) when a release is cut
+with `make cut-release`.
+
+## Unreleased
+
+### Features
+
+- Direct Preference Optimization pipeline with service, benchmarks, and docs
+
+### Bug fixes
+
+- Guard degenerate evaluation inputs (#8)
+
+### Documentation
+
+- Use plain, factual wording (#7)
+- Standard README structure and language framing (#10)
+- Horizontal layered architecture diagram
+- Compact horizontal architecture diagram
+- Recorded demos of more commands, with their vhs tapes (#1)
+- Recorded demos of the HTTP service and more commands (#2)
+- Describe the supply chain accurately (#3)
+
+### Build and CI
+
+- Run CodeQL on main and on a weekly schedule only
+
+### Maintenance
+
+- Initialize repository
+- Bump GitHub Actions to current major versions
+- Remove Dependabot configuration
