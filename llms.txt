@@ -1,0 +1,37 @@
+# Preference Optimization
+
+> Direct Preference Optimization built from scratch: a supervised reference policy, a Bradley-Terry preference dataset, and an exact, hand-derived DPO gradient that aligns the policy to the hidden reward.
+
+Languages: Python. License: MIT. Source: https://github.com/adeoluo/preference-optimization
+
+## Docs
+
+- [README](https://github.com/adeoluo/preference-optimization/blob/main/README.md): motivation, architecture, results, quickstart, usage, design decisions, testing, responsible ai, limitations, roadmap
+- [AGENTS.md](https://github.com/adeoluo/preference-optimization/blob/main/AGENTS.md): layout, commands and conventions for changing the code
+- [Architecture diagram](https://github.com/adeoluo/preference-optimization/blob/main/docs/architecture/architecture.mmd): Mermaid source of the component diagram
+- [Case Study - Aligning a policy from noisy preferences](https://github.com/adeoluo/preference-optimization/blob/main/docs/CASE_STUDY.md)
+- [Data Card - Preference Optimization](https://github.com/adeoluo/preference-optimization/blob/main/docs/DATA_CARD.md)
+- [Definition of Done](https://github.com/adeoluo/preference-optimization/blob/main/docs/DEFINITION_OF_DONE.md)
+- [Evaluation Report - Preference Optimization](https://github.com/adeoluo/preference-optimization/blob/main/docs/EVALUATION_REPORT.md)
+- [Model / System Card - Preference Optimization](https://github.com/adeoluo/preference-optimization/blob/main/docs/MODEL_CARD.md)
+- [Operations Guide - Preference Optimization](https://github.com/adeoluo/preference-optimization/blob/main/docs/OPERATIONS.md)
+- [Scaling - Preference Optimization](https://github.com/adeoluo/preference-optimization/blob/main/docs/SCALING.md)
+- [Threat Model - Preference Optimization](https://github.com/adeoluo/preference-optimization/blob/main/docs/THREAT_MODEL.md)
+- [ADR-0001: Record architecture decisions](https://github.com/adeoluo/preference-optimization/blob/main/docs/adr/0001-record-architecture-decisions.md)
+- [ADR-0002: Direct Preference Optimization instead of a reward model and PPO](https://github.com/adeoluo/preference-optimization/blob/main/docs/adr/0002-direct-preference-optimization.md)
+- [ADR-0003: A log-linear policy with an exact gradient](https://github.com/adeoluo/preference-optimization/blob/main/docs/adr/0003-log-linear-policy.md)
+- [ADR-NNNN: <short title>](https://github.com/adeoluo/preference-optimization/blob/main/docs/adr/template.md)
+- [Changelog](https://github.com/adeoluo/preference-optimization/blob/main/CHANGELOG.md): release history
+
+## Source
+
+- [src/preference_optimization/__init__.py](https://github.com/adeoluo/preference-optimization/blob/main/src/preference_optimization/__init__.py): Preference Optimization - Direct Preference Optimization from scratch.
+- [src/preference_optimization/cli.py](https://github.com/adeoluo/preference-optimization/blob/main/src/preference_optimization/cli.py): Command line interface for preference optimization.
+- [src/preference_optimization/domain.py](https://github.com/adeoluo/preference-optimization/blob/main/src/preference_optimization/domain.py): The alignment task: prompts, candidate responses, and a hidden gold reward.
+- [src/preference_optimization/dpo.py](https://github.com/adeoluo/preference-optimization/blob/main/src/preference_optimization/dpo.py): Direct Preference Optimization with an exact, hand-derived gradient.
+- [src/preference_optimization/evaluation.py](https://github.com/adeoluo/preference-optimization/blob/main/src/preference_optimization/evaluation.py): Evaluation metrics for preference optimization.
+- [src/preference_optimization/observability.py](https://github.com/adeoluo/preference-optimization/blob/main/src/preference_optimization/observability.py): In-process request metrics for the HTTP service (Prometheus text exposition).
+- [src/preference_optimization/pipeline.py](https://github.com/adeoluo/preference-optimization/blob/main/src/preference_optimization/pipeline.py): The end-to-end alignment pipeline: build task, fit reference, run DPO, evaluate.
+- [src/preference_optimization/policy.py](https://github.com/adeoluo/preference-optimization/blob/main/src/preference_optimization/policy.py): A log-linear softmax policy over candidate responses.
+- [src/preference_optimization/service.py](https://github.com/adeoluo/preference-optimization/blob/main/src/preference_optimization/service.py): A standard-library HTTP service exposing the aligned policy.
+- [src/preference_optimization/sft.py](https://github.com/adeoluo/preference-optimization/blob/main/src/preference_optimization/sft.py): Supervised fine-tuning by behavior cloning.
