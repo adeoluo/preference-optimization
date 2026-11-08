@@ -1,10 +1,22 @@
 cff-version: 1.2.0
-message: "If you use this work, please cite it."
+message: "If you use this software, please cite it as below."
+type: software
 title: "Preference Optimization"
+abstract: "Direct Preference Optimization from scratch: a behavior-cloned reference, a Bradley-Terry preference dataset, and an exact DPO gradient that aligns a policy to a hidden reward."
 authors:
   - family-names: "Ogunnoiki"
     given-names: "Adeolu"
-version: 0.1.0
-date-released: 2026-01-01
+version: "0.1.0"
+date-released: "2026-11-03"
 license: MIT
+repository-code: "https://github.com/adeoluo/preference-optimization"
 url: "https://github.com/adeoluo/preference-optimization"
+keywords:
+  - "alignment"
+  - "bradley-terry"
+  - "dpo"
+  - "from-scratch"
+  - "post-training"
+  - "preference-optimization"
+  - "python"
+  - "rlhf"
